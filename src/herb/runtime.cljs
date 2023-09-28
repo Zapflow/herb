@@ -1,14 +1,16 @@
 (ns herb.runtime
-  (:require [goog.dom :as dom]
-            [goog.object :as gobj]
-            [garden.core :refer [css]]
-            [garden.selectors :as s]))
+  (:require
+    [clojure.string :as str]
+    [goog.dom :as dom]
+    [goog.object :as gobj]
+    [garden.core :refer [css]]
+    [garden.selectors :as s]))
 
 (def dev? ^boolean js/goog.DEBUG)
 
 (defonce
   ^{:private true
-    :doc "Atom containing all styles added to DOM. Takes the form of a map with
+    :doc     "Atom containing all styles added to DOM. Takes the form of a map with
   classnames as keys. The map entry contains a `:data` which is Herb's
   representation of a style unit, `:data-string` which is what is used as the
   style data attribute in DOM, and `:css` which contains the rendered CSS
@@ -17,7 +19,7 @@
 
 (defonce
   ^{:private true
-    :doc "Atom containing all keyframe CSS added to DOM. Takes the form of a map
+    :doc     "Atom containing all keyframe CSS added to DOM. Takes the form of a map
   with a namespace as a key. A map entry contains the keys `:data` which is herb's
   representation of a keyframe unit and `:css` which is the rendered CSS
   string"}
@@ -25,7 +27,7 @@
 
 (defonce
   ^{:private true
-    :doc "Atom containing all global style added to DOM. Takes the form of a map
+    :doc     "Atom containing all global style added to DOM. Takes the form of a map
   with namespace as keys. A map entry contains `:data` which is a collection of
   global styles for a given via defglobal call and `:css` that contains the
   rendered CSS"}
@@ -48,15 +50,25 @@
         (assoc-in [ident :css] css))))
 
 (def combinator-fns
-  {:> s/>
-   :+ s/+
-   :- s/-
+  {:>          s/>
+   :+          s/+
+   :-          s/-
    :descendant s/descendant})
+
+(def attribute-fns
+  {:attr              s/attr
+   :attr=             s/attr=
+   :attr-contains     s/attr-contains
+   :attr-matches      s/attr-matches
+   :attr-starts-with  s/attr-starts-with
+   :attr-starts-with* s/attr-starts-with*
+   :attr-ends-with    s/attr-ends-with})
 
 (defn- render-style!
   "Renders CSS, and appends to DOM. Ensure state is in sync with DOM."
   [identifier new]
-  (let [style (let [[classname {:keys [style pseudo media supports prefix vendors combinators]}] (:data new)]
+  (let [style (let [[classname {:keys [style pseudo media supports prefix
+                                       vendors combinators attributes]}] (:data new)]
                 [[classname (with-meta style {:prefix prefix :vendors vendors})
                   pseudo media supports]
                  [(map (fn [[[combinator & elements] style]]
@@ -64,12 +76,23 @@
                            [(apply cfn classname elements) style]
                            (throw (ex-info "Unsupported combinator function "
                                            {:combinator combinator
-                                            :elements elements
-                                            :style style}))))
-                       combinators)]])
-        css-str (css {:vendors (seq (:vendors @options))
+                                            :elements   elements
+                                            :style      style}))))
+                       combinators)]
+                 [(map (fn [[[attribute-fn-key & args] style]]
+                         (if-let [attr-fn (get attribute-fns attribute-fn-key)]
+                           (let [attribute-selector (apply attr-fn args)
+                                 selector (s/selector (str (s/css-selector classname)
+                                                           (s/css-selector attribute-selector)))]
+                             [selector style])
+                           (throw (ex-info "Unsupported attribute function"
+                                           {:attribute attribute-fn-key
+                                            :args      args
+                                            :style     style}))))
+                       attributes)]])
+        css-str (css {:vendors       (seq (:vendors @options))
                       :pretty-print? dev?
-                      :auto-prefix (seq (:auto-prefix @options))}
+                      :auto-prefix   (seq (:auto-prefix @options))}
                      style)]
     (dom/appendChild (:element new) (dom/createTextNode css-str))
     (swap! injected-styles update-state identifier new css-str)))
@@ -93,7 +116,7 @@
   [identifier new data-str]
   (let [element (create-element! data-str)]
     (render-style! identifier (cond-> {:data new :element element}
-                                data-str (assoc :data-string data-str)))))
+                                      data-str (assoc :data-string data-str)))))
 
 
 (defn inject-style!
@@ -110,10 +133,10 @@
       (and (some? injected)
            (not target))
       (render-style!
-       identifier
-       {:data new
-        :element (:element injected)
-        :data-string data-str}))
+        identifier
+        {:data        new
+         :element     (:element injected)
+         :data-string data-str}))
 
     (get @injected-styles identifier)))
 

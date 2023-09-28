@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as str]
    [herb.runtime :as runtime]
-   [garden.stylesheet :refer [at-media at-supports]]))
+   [garden.stylesheet :refer [at-media at-supports rule]]))
 
 (def dev? ^boolean js/goog.DEBUG)
 
@@ -98,7 +98,8 @@
                      :prefix identity
                      :vendors convert-vendors
                      :pseudo convert-pseudo
-                     :combinators identity)
+                     :combinators identity
+                     :attributes identity)
         extracted (into [] (process-meta-xform meta-type) styles)]
     (when (seq extracted)
       (let [merged (case meta-type
@@ -119,7 +120,8 @@
     :prefix (extract-meta resolved-styles :prefix)
     :supports (extract-meta resolved-styles :supports)
     :media (extract-meta resolved-styles :media)
-    :combinators (extract-meta resolved-styles :combinators)})
+    :combinators (extract-meta resolved-styles :combinators)
+    :attributes (extract-meta resolved-styles :attributes)})
 
 (defn- sanitize
   "Takes `input` and remove any non-valid characters"

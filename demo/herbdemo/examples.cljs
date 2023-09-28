@@ -1,41 +1,25 @@
 (ns herbdemo.examples
   (:require
-   [herb.core :refer [<class defgroup join defkeyframes defglobal]]
-   ; [garden.selectors :as s]
-   ; [garden.core :refer [css]]
-   ; [garden.stylesheet :refer [at-media]]
-   [garden.units :refer [px em rem]]
-   ; [reagent.debug :as d]
-   [reagent.core :as r])
+    [herb.core :refer [<class defgroup join defkeyframes defglobal]]
+    ; [garden.selectors :as s]
+    ; [garden.core :refer [css]]
+    ; [garden.stylesheet :refer [at-media]]
+    [garden.units :refer [px em rem]]
+    ; [reagent.debug :as d]
+    [reagent.core :as r])
   )
 
 (def red {:color "red"})
 (def green {:color "green"})
 
 (defglobal global
-  [:.global {:color "magenta"
-             :font-size (px 24)}])
-
-(defn selector-inherit
-  []
-  ^{:combinators {[:- :div] {:background "yellow"}}}
-  {:font-size "16px"})
-
-(defn selector-test []
-  ^{:extend selector-inherit
-    :combinators {[:> :div :span] {:margin-left "10px"
-                                   :background "red"}
-                  [:+ :p] {:background "purple"
-                           :margin 0
-                           :margin-left "20px"}
-                  [:descendant :div] {:background "green"}}}
-  {:background :blue
-   :color :white})
+           [:.global {:color     "magenta"
+                      :font-size (px 24)}])
 
 (defn state-hover
   [color]
   ^{:pseudo {:hover {:color "yellow"}}}
-  {:margin-bottom 0
+  {:margin-bottom    0
    :background-color color})
 
 (defn toggle-color
@@ -92,7 +76,7 @@
 (defn cycle-color
   [color]
   ^{:extend [[dynamic-text-color color] [bold]]}
-  {:text-align "center"
+  {:text-align       "center"
    :background-color color}
   )
 
@@ -103,39 +87,39 @@
 
 (defn blue-div
   []
-  {:color "black"
+  {:color            "black"
    :background-color "blue"})
 
 (defn red-div
   []
   ^{:extend blue-div
-    :media {{:screen true} {:color "magenta"}}}
-  {:color "white"
+    :media  {{:screen true} {:color "magenta"}}}
+  {:color            "white"
    :background-color "red"})
 
 (defn cyan-div
   []
   ^{:extend red-div
-    :media {{:screen true} {:color "white"
-                            :background-color "purple"}}}
+    :media  {{:screen true} {:color            "white"
+                             :background-color "purple"}}}
   {:background-color "cyan"})
 
 (defn media-query-test
   [color]
   ^{:extend cyan-div
-    :media {{:screen true} {:color "white"
-                            :background-color color}
-            {:max-width "800px"} {:background-color "yellow"}}}
+    :media  {{:screen true}       {:color            "white"
+                                   :background-color color}
+             {:max-width "800px"} {:background-color "yellow"}}}
   {:background "magenta"
    :text-align "center"
-   :color "white"})
+   :color      "white"})
 
 (defn profile-comp
   [_]
-  {:width (px 100)
-   :height (px 100)
+  {:width            (px 100)
+   :height           (px 100)
    :background-color "magenta"
-   :border-radius "5px"})
+   :border-radius    "5px"})
 
 (defn extend-1
   [color]
@@ -154,31 +138,31 @@
 (defn style-group-stateful
   [component color]
   (component
-   {:text {:color color}
-    :box {:background-color color
-          :padding (px 12)}
-    :text-2 {:color color}}))
+    {:text   {:color color}
+     :box    {:background-color color
+              :padding          (px 12)}
+     :text-2 {:color color}}))
 
 (defn style-group-static
   [component]
   (component
-   {:text {:color "magenta"}
-    :box {:background "white"
-          :padding (px 12)}
-    :text-2 {:color "cyan"}}))
+    {:text   {:color "magenta"}
+     :box    {:background "white"
+              :padding    (px 12)}
+     :text-2 {:color "cyan"}}))
 
 (defgroup group-macro
-  {:text {:font-weight "bold"
-          :color "white"}
-   :box {:background-color "#333"
-         :padding (px 5)
-         :margin [["10px" 0 "10px" 0]]
-         :border-radius "5px"}})
+          {:text {:font-weight "bold"
+                  :color       "white"}
+           :box  {:background-color "#333"
+                  :padding          (px 5)
+                  :margin           [["10px" 0 "10px" 0]]
+                  :border-radius    "5px"}})
 
 (defgroup group-with-args
-  {:text {:font-style "italic"
-          :color "white"}
-   :box {:background (first args)}})
+          {:text {:font-style "italic"
+                  :color      "white"}
+           :box  {:background (first args)}})
 
 (defn supports-thing
   []
@@ -203,40 +187,40 @@
 
 (defn inline-prefixes
   []
-  {:-moz {:border-radius "3px"
-          :box-sizing "border-box"}
+  {:-moz             {:border-radius "3px"
+                      :box-sizing    "border-box"}
    :background-color "black"
-   :color "white"})
+   :color            "white"})
 
 (defn shadow-prefix
   []
   {:transition "all 1s ease-out"
-   :font-size (px 24)})
+   :font-size  (px 24)})
 
 (defn test-global-prefixes
   []
   ^{:extend shadow-prefix}
   {:background-color "black"
-   :border-radius (px 3)
-   :color "white"})
+   :border-radius    (px 3)
+   :color            "white"})
 
 (defgroup multiple-vendor-group
-  {:component-1
-   ^{:vendors ["webkit"]
-     :prefix true}
-   {:transition "all 1s ease-in"}
-   :component-2
-   ^{:vendors ["ms"]
-     :prefix true}
-   {:border-radius "50%"}})
+          {:component-1
+           ^{:vendors ["webkit"]
+             :prefix  true}
+           {:transition "all 1s ease-in"}
+           :component-2
+           ^{:vendors ["ms"]
+             :prefix  true}
+           {:border-radius "50%"}})
 
 (defgroup multiple-meta-group
-  {:component-1
-   ^{:pseudo {:hover {:border-radius "50%"}}}
-   {:width (px 60)
-    :transition "all 0.5s ease-in"
-    :height (px 60)
-    :background "black"}})
+          {:component-1
+           ^{:pseudo {:hover {:border-radius "50%"}}}
+           {:width      (px 60)
+            :transition "all 0.5s ease-in"
+            :height     (px 60)
+            :background "black"}})
 
 (defn transition
   [_]
@@ -244,41 +228,41 @@
 
 (declare pulse-animation)
 (defkeyframes pulse-animation
-  [:from {:opacity 1}]
-  [:to {:opacity 0}])
+              [:from {:opacity 1}]
+              [:to {:opacity 0}])
 
 (declare width-vary)
 (defkeyframes width-vary
-  [:from {:width "100%"}]
-  [:to {:width "50%"}])
+              [:from {:width "100%"}]
+              [:to {:width "50%"}])
 
 (declare percentages)
 (defkeyframes percentages
-  ["0%" {:top 0 :left 0}]
-  ["30%" {:top (px 50)}]
-  ["68%" {:left (px 50)}])
+              ["0%" {:top 0 :left 0}]
+              ["30%" {:top (px 50)}]
+              ["68%" {:left (px 50)}])
 
 (defn pulse-component
   []
   {
-   :animation [[pulse-animation "2s" :infinite :alternate]]
+   :animation        [[pulse-animation "2s" :infinite :alternate]]
    :background-color "black"
-   :width (px 20)
-   :height (px 20)}
+   :width            (px 20)
+   :height           (px 20)}
   )
 
 (defn pulse-component-two
   []
-  {:animation [[pulse-animation "2s" :infinite :alternate]]
+  {:animation        [[pulse-animation "2s" :infinite :alternate]]
    :background-color "green"
-   :width (px 20)
-   :height (px 20)})
+   :width            (px 20)
+   :height           (px 20)})
 
 (defn width-vary-component
   []
-  {:animation [[width-vary "2s" "cubic-bezier(.77, 0, .175, 1)" :infinite :alternate]]
+  {:animation        [[width-vary "2s" "cubic-bezier(.77, 0, .175, 1)" :infinite :alternate]]
    :background-color "red"
-   :height (px 20)})
+   :height           (px 20)})
 
 (defn row
   []
@@ -297,33 +281,150 @@
 (defn large
   [_]
   {:background "magenta"
-   :width "100%"
-   :height "20px"
-   :margin [["10px" 0 "10px" 0]]})
+   :width      "100%"
+   :height     "20px"
+   :margin     [["10px" 0 "10px" 0]]})
 
 (defn simple-state [color]
   {:background color
-   :height (px 100)
-   :width "100%"})
+   :height     (px 100)
+   :width      "100%"})
+
+(defn selector-inherit
+  []
+  ^{:combinators {[:- :div] {:background "yellow"}}}
+  {:font-size "16px"})
+
+(defn selector-test []
+  ^{:extend      selector-inherit
+    :combinators {[:> :div :span]    {:margin-left "10px"
+                                      :background  "red"}
+                  [:+ :p]            {:background  "purple"
+                                      :margin      0
+                                      :margin-left "20px"}
+                  [:descendant :div] {:background "green"}}}
+  {:background :blue
+   :color      :white})
+
+; Selectors
+(defn attr-selector
+  []
+  ^{:attributes {[:attr :data-section-title]            {:font-size "25px"}
+                 [:attr= :data-value :bg-pink]          {:background "pink"}
+                 [:attr-contains :data-value :test]     {:background "lightblue"}
+                 [:attr-matches :data-value :test]      {:background "green"}
+                 [:attr-starts-with :data-value :test]  {:background "lightgrey"}
+                 [:attr-starts-with* :data-value :test] {:background "pink"}
+                 [:attr-ends-with :data-value :test]    {:background "orange"}}}
+  {:font-size    "20px"
+   :padding-left "20px"})
 
 (defn main []
   (let [state (r/atom "green")]
     (fn []
 
       #_[:div
-       [:div {:class (<class simple-state "green")}]
-       [:div {:class (<class simple-state "green")}]
-       [:div {:class (<class simple-state "red")}]
-       [:div {:class (<class simple-state "red")}]]
+         [:div {:class (<class simple-state "green")}]
+         [:div {:class (<class simple-state "green")}]
+         [:div {:class (<class simple-state "red")}]
+         [:div {:class (<class simple-state "red")}]]
 
       #_[:div
-       [:div {:class (<class simple-state @state)}]
-       [:br]
-       [:button {:on-click #(swap! state toggle-color)}
-        "Change color"]
+         [:div {:class (<class simple-state @state)}]
+         [:br]
+         [:button {:on-click #(swap! state toggle-color)}
+          "Change color"]
+         ]
+
+      [:div
+       {:class (<class container)}
+
+       [:div
+        {:data-section-title ""
+         :class              (<class attr-selector)}
+        "Attribute selectors"]
+
+
+       [:div
+        {:data-value :bg-pink
+         :class      (<class attr-selector)}
+        "[attr]"]
+
+       [:div
+        {:data-value :test
+         :class      (<class attr-selector)}
+        "[attr=value]"]
+
+
+       [:div
+        {:data-value "value test value"
+         :class      (<class attr-selector)}
+        "[attr~=value]"]
+
+       [:div
+        {:data-value "value-test-value"
+         :class      (<class attr-selector)}
+        "[attr*=value]"]
+
+       [:div
+        {:data-value "testvalue"
+         :class      (<class attr-selector)}
+        "[attr^=value]"]
+
+       [:div
+        {:data-value "test-value"
+         :class      (<class attr-selector)}
+        "[attr|=value]"]
+
+       [:div
+        {:data-value "valuetest"
+         :class      (<class attr-selector)}
+        "[attr$=value]"]
+
        ]
 
       [:div {:class (<class container)}
+       [:div
+        {:data-section-title ""
+         :class              (<class attr-selector)}
+        "Attribute selectors"]
+
+
+       [:div
+        {:data-value :bg-pink
+         :class      (<class attr-selector)}
+        "[attr]"]
+
+       [:div
+        {:data-value :test
+         :class      (<class attr-selector)}
+        "[attr=value]"]
+
+
+       [:div
+        {:data-value "value test value"
+         :class      (<class attr-selector)}
+        "[attr~=value]"]
+
+       [:div
+        {:data-value "value-test-value"
+         :class      (<class attr-selector)}
+        "[attr*=value]"]
+
+       [:div
+        {:data-value "testvalue"
+         :class      (<class attr-selector)}
+        "[attr^=value]"]
+
+       [:div
+        {:data-value "test-value"
+         :class      (<class attr-selector)}
+        "[attr|=value]"]
+
+       [:div
+        {:data-value "valuetest"
+         :class      (<class attr-selector)}
+        "[attr$=value]"]
        (for [d data]
          ^{:key d}
          [:div {:class (<class data-str d)}
@@ -392,38 +493,38 @@
          [:div {:class (<class (fn []
                                  ^{:extend button}
                                  {:background-color "black"
-                                  :color "white"}))}
+                                  :color            "white"}))}
           "Anon function with meta"]
          [:div {:class (<class (fn [color]
                                  {:background-color color
-                                  :color "white"})
+                                  :color            "white"})
                                "black")}
           "Anon function without meta"]]
 
         [:div {:class (<class (fn [color]
                                 {:background "orange"
-                                 :color color})
+                                 :color      color})
                               "black")}
-          "Same signature anon"]
+         "Same signature anon"]
 
         (letfn [(nested-fn [color]
                   {:background-color color
-                   :color "white"})]
+                   :color            "white"})]
           [:div {:class (<class nested-fn "black")}
            "letfn block"])
 
         [:div {:class (<class (fn named-anon []
                                 {:background-color "pink"
-                                 :color "black"}))}
+                                 :color            "black"}))}
          "Named anon fn"
          ]
 
-        [:input {:class (<class hover-focus)
+        [:input {:class         (<class hover-focus)
                  :default-value "test modes hover, active"}]
         [:div
          [:h2 {:class (<class state-hover @state)}
           "Testing hover and state change via button"]
-         [:button {:class (<class button)
+         [:button {:class    (<class button)
                    :on-click #(swap! state toggle-color)}
           "change color"]
          (for [c ["yellow" "blue" "green" "purple"]]
